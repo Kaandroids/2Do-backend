@@ -1,18 +1,47 @@
-version: '3.8'
-name: todo
 services:
+  # --- Database Service (PostgreSQL) ---
   postgres:
-    image: postgres:16-alpine
-    container_name: 2do
+    image: postgres:16
+    container_name: 2do-postgres
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=db_2do
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: 2do_db
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      # Persist data to a Docker volume so it survives container restarts
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - 2do-network
     restart: always
 
+  # --- Backend API Service (Spring Boot) ---
+  app:
+    build: .             # Build the image from the Dockerfile in the current directory
+    container_name: 2do-api
+    ports:
+      - "8080:8080"      # Map host port 8080 to container port 8080
+    environment:
+      # Connection string uses the service name 'postgres' instead of 'localhost'
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/2do_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      # Automatically update the database schema on startup
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - postgres         # Ensure database starts before the application
+    networks:
+      - 2do-network
+    restart: always
+
+# --- Volumes ---
+# Named volume for persistent database storage
 volumes:
-  db_data:
+  postgres_data:
+
+# --- Networks ---
+# Custom bridge network for isolated communication between containers
+networks:
+  2do-network:
+    driver: bridge

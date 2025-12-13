@@ -15,11 +15,12 @@ This project follows **Clean Architecture** principles, utilizing **SOLID** desi
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
-* **Database:** PostgreSQL (Containerized via Docker)
+* **Database:** PostgreSQL 16
+* **Containerization:** Docker & Docker Compose (Full Stack)
 * **Testing:** JUnit 5, Mockito
 * **Security:** Spring Security 6, JWT Authentication & Authorization
 * **ORM & Mapping:** Hibernate / JPA, MapStruct
-* **Tools:** Docker & Docker Compose, Lombok, Maven
+* **Tools:** Lombok, Maven
 * **Documentation:** OpenAPI (Swagger UI)
 
 ## 🏗 Key Features & Architecture
@@ -30,36 +31,50 @@ This project follows **Clean Architecture** principles, utilizing **SOLID** desi
 * **DTO Pattern:** Strict separation between persistence entities and API exposure layers.
 * **Unit Testing:** Comprehensive unit tests using **JUnit 5** and **Mockito** to ensure business logic reliability.
 * **Performance:** Utilizes `MapStruct` for high-performance, type-safe object mapping and `FetchType.LAZY` for database optimization.
-* **Validation:** Robust input validation using Jakarta Validation (`@Valid`, `@NotBlank`, `@FutureOrPresent`).
-
+* **Validation:** Robust input validation using Jakarta Validation (`@Valid`, `@NotBlank`, etc.).
 ## 🚀 Getting Started
 
 Follow these steps to get the project up and running on your local machine.
 
 ### Prerequisites
-* Docker & Docker Compose
-* Java 21 JDK
-* Maven
+* **Docker Desktop** (Required for database and containerized app)
+* **Java 21 JDK** & **Maven** (Only required for local development)
 
 ### Installation
 
+### Option 1: Full Docker Setup (Recommended)
+This method builds the application image and starts both the Database and the API in isolated containers.
+
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/kaandroids/2Do.git
+    git clone [https://github.com/kaandroids/2Do.git](https://github.com/kaandroids/2Do.git)
     cd 2Do
     ```
 
-2.  **Start the Database (Docker)**
-    Spin up the PostgreSQL container using Docker Compose:
+2.  **Build and Run**
     ```bash
-    docker-compose up -d
+    docker-compose up --build
+    ```
+    *This command compiles the code, creates the Docker image, and starts the services.*
+
+3.  **Access the API**
+    The application will be available at `http://localhost:8080`.
+
+---
+
+### Option 2: Local Development Setup
+Use this method if you want to run the database in Docker but debug the Java code locally in your IDE.
+
+1.  **Start only the Database**
+    ```bash
+    docker-compose up postgres -d
     ```
 
-3.  **Run the Application**
+2.  **Run the Application**
     ```bash
     mvn spring-boot:run
     ```
-    The application will start on `http://localhost:8080`.
+    *Ensure your `application.properties` points to `localhost:5432` for this method.*
 
 ## 📚 API Documentation
 
@@ -69,7 +84,7 @@ Once the application is running, you can access the interactive API documentatio
 
 ### How to Authenticate in Swagger:
 1.  Use the `/api/v1/auth/register` endpoint to create a new user.
-2.  Use the `/api/v1/auth/authenticate` endpoint to login and receive a **JWT Token**.
+2.  Use the `/api/v1/auth/authenticate` endpoint to log in and receive a **JWT Token**.
 3.  Click the **"Authorize"** button at the top right of the Swagger page.
 4.  Paste the token directly (e.g., `eyJhbGci...`). **Do not** add the "Bearer " prefix, Swagger handles it automatically.
 
@@ -91,6 +106,19 @@ The system implements a dual-role mechanism:
 | `GET` | `/api/v1/tasks/{id}` | Get specific task details | USER, ADMIN |
 | `PUT` | `/api/v1/tasks/{id}` | Update an existing task | USER, ADMIN |
 | `DELETE` | `/api/v1/tasks/{id}` | Delete a task | USER, ADMIN |
+
+## 🔧 Troubleshooting
+
+**"Password authentication failed" or Database Connection Issues:**
+If you change database credentials in `docker-compose.yml`, the existing database volume might still retain the old password. To fix this, you need to reset the volume:
+
+```bash
+# Stop containers and remove volumes
+docker-compose down -v
+
+# Rebuild and start
+docker-compose up --build
+```
 
 ## 🧪 Running Tests
 
