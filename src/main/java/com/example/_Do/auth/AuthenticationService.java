@@ -46,8 +46,7 @@ public class AuthenticationService {
         // Encode the password (mapper copied the raw one)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         // Force ROLE_USER for public registration (Safety measure)
-        user.setRole(Role.ROLE_USER);
-
+        user.setRole(Role.USER);
         userRepository.save(user);
         log.info("User registered successfully with ID: {}", user.getId());
 

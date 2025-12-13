@@ -75,11 +75,11 @@ public class User implements UserDetails {
 
     /**
      * Returns the authorities granted to the user.
-     * Converts the Role enum into a SimpleGrantedAuthority.
+     * Delegates the authority generation to the {@link Role} enum logic.
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.role.name()));
+        return role.getAuthorities();
     }
 
     /**
