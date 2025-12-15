@@ -1,6 +1,8 @@
 package com.example._Do.task.repository;
 
 import com.example._Do.task.entity.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      * @param userId The ID of the user.
      * @return List of tasks owned by the user.
      */
-    List<Task> findAllByUserId(Long userId);
+    Page<Task> findAllByUserId(Long userId, Pageable pageable);
 
     /**
      * Retrieves tasks for a specific user filtered by completion status.

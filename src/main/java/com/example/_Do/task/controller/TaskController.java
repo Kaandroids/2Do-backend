@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,18 +57,22 @@ public class TaskController {
     }
 
     /**
-     * Retrieves all tasks belonging to the authenticated user.
+     * Retrieves tasks belonging to the authenticated user with pagination.
      *
-     * @return A list of tasks owned by the user.
+     * @param pageable Pagination information (page number, size, sort).
+     * @return A page of tasks owned by the user.
      */
     @GetMapping
     @Operation(
-            summary = "Get my tasks",
-            description = "Retrieves a list of all tasks belonging to the authenticated user."
+            summary = "Get my tasks (Paged)",
+            description = "Retrieves a paged list of tasks belonging to the authenticated user. " +
+                    "You can filter by page, size, and sort. Example: ?page=0&size=5&sort=createdAt,desc"
     )
-    @ApiResponse(responseCode = "200", description = "List of tasks retrieved successfully")
-    public ResponseEntity<List<TaskResponse>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    @ApiResponse(responseCode = "200", description = "Page of tasks retrieved successfully")
+    public ResponseEntity<Page<TaskResponse>> getAllTasks(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
     /**

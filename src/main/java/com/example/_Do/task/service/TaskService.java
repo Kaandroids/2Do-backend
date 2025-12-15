@@ -10,6 +10,8 @@ import com.example._Do.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -59,14 +61,13 @@ public class TaskService {
      * Retrieves all tasks belonging to the current user.
      */
     @Transactional(readOnly = true)
-    public List<TaskResponse> getAllTasks() {
+    public Page<TaskResponse> getAllTasks(Pageable pageable) {
         User currentUser = getCurrentUser();
         log.info("Retrieving all tasks for user: {}", currentUser);
 
-        return taskRepository.findAllByUserId(currentUser.getId())
-                .stream()
-                .map(taskMapper::toResponse)
-                .toList();
+        Page<Task> taskPage = taskRepository.findAllByUserId(currentUser.getId(), pageable);
+
+        return taskPage.map(taskMapper::toResponse);
     }
 
     /**
