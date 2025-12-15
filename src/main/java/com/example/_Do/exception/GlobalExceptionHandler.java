@@ -2,6 +2,7 @@ package com.example._Do.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,7 +21,10 @@ import java.util.stream.Collectors;
  * </p>
  */
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ErrorResponseMapper errorResponseMapper;
 
     /**
      * Handles cases where a requested resource is not found in the persistence layer.
@@ -34,13 +38,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest request) {
-        ErrorResponse error = ErrorResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .build();
-
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.NOT_FOUND, request);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
@@ -62,12 +60,7 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        ErrorResponse error = ErrorResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(errorMessage)
-                .timestamp(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .build();
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(errorMessage, HttpStatus.BAD_REQUEST, request);
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -85,12 +78,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
-        ErrorResponse error = ErrorResponse.builder()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("An unexpected error occurred: " + ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .path(request.getRequestURI())
-                .build();
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

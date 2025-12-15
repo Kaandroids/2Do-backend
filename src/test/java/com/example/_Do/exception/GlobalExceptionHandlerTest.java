@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +27,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
-    /**
-     * The subject under test.
-     * Mockito will automatically inject any @Mock fields into this instance if needed.
-     */
+    // The component under test.
+    @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;
+
+    /**
+     * A spy of the real Mapper component.
+     * <p>
+     * @Spy is used instead of @Mock because we want to execute the
+     * actual logic inside {@link ErrorResponseMapper}. If we used a Mock,
+     * we would be testing a stubbed response rather than the real mapping transformation.
+     * </p>
+     */
+    @Spy
+    private ErrorResponseMapper errorResponseMapper;
 
     /**
      * Mocked HttpServletRequest to simulate the web request context.
@@ -38,19 +48,6 @@ class GlobalExceptionHandlerTest {
      */
     @Mock
     private HttpServletRequest request;
-
-    /**
-     * Prepares the test environment before each test method execution.
-     * <p>
-     * Manually initializes the {@link GlobalExceptionHandler} to ensure a fresh instance
-     * is available for every test case. Direct instantiation is preferred here as the
-     * handler is stateless and does not require complex dependency injection.
-     * </p>
-     */
-    @BeforeEach
-    void setUp() {
-        globalExceptionHandler = new GlobalExceptionHandler();
-    }
 
     @Test
     @DisplayName("Should return 404 Not Found when EntityNotFoundException is thrown")
