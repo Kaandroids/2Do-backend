@@ -29,10 +29,12 @@ This project follows **Clean Architecture** principles, utilizing **SOLID** desi
 * **Task Management:** Full CRUD operations for managing tasks with ownership security (Users can only access their own tasks).
 * **Stateless Authentication:** Secure and scalable authentication via JWT.
 * **DTO Pattern:** Strict separation between persistence entities and API exposure layers.
+* **Global Exception Handling:** Centralized error management using `@RestControllerAdvice` (AOP) with SRP-compliant mapping via `ErrorResponseMapper` and standardized JSON responses.
 * **Unit Testing:** Comprehensive unit tests using **JUnit 5** and **Mockito** to ensure business logic reliability.
 * **Performance:** Utilizes `MapStruct` for high-performance, type-safe object mapping and `FetchType.LAZY` for database optimization.
 * **Validation:** Robust input validation using Jakarta Validation (`@Valid`, `@NotBlank`, etc.).
-## 🚀 Getting Started
+
+### 🚀 Getting Started
 
 Follow these steps to get the project up and running on your local machine.
 
@@ -47,7 +49,7 @@ This method builds the application image and starts both the Database and the AP
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/kaandroids/2Do.git](https://github.com/kaandroids/2Do.git)
+    git clone https://github.com/kaandroids/2Do.git
     cd 2Do
     ```
 
