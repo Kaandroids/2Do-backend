@@ -12,6 +12,15 @@
 
 This project follows **Clean Architecture** principles, utilizing **SOLID** design patterns, and implements industry-standard security measures using **JWT (JSON Web Tokens)**.
 
+## 🔗 Frontend Repository
+
+This project serves as the **Backend API** for the 2Do Task Management System.
+The user interface is built with **Angular 17+** and **Bootstrap 5**.
+
+You can find the frontend source code and installation instructions here:
+
+👉 **[View Frontend Repository (Angular UI)](https://github.com/kaandroids/2Do-frontend)**
+
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
@@ -51,6 +60,7 @@ src
 │   │   └── Application.java
 │   └── resources         # Application properties
 └── test                  # Unit Tests
+```
 
 ### 🚀 Getting Started
 
