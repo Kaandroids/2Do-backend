@@ -33,6 +33,24 @@ This project follows **Clean Architecture** principles, utilizing **SOLID** desi
 * **Unit Testing:** Comprehensive unit tests using **JUnit 5** and **Mockito** to ensure business logic reliability.
 * **Performance:** Utilizes `MapStruct` for high-performance, type-safe object mapping and `FetchType.LAZY` for database optimization.
 * **Validation:** Robust input validation using Jakarta Validation (`@Valid`, `@NotBlank`, etc.).
+* **API Documentation:** Integrated **Swagger UI (OpenAPI 3)** for interactive API exploration and testing.
+
+## 📂 Project Structure
+
+A quick look at the top-level directory structure which adheres to Clean Architecture principles:
+
+```text
+src
+├── main
+│   ├── java/com/example/_Do
+│   │   ├── auth          # Authentication logic (Register/Login)
+│   │   ├── config        # Security, Swagger, Application Configs
+│   │   ├── exception     # Global Exception Handling
+│   │   ├── task          # Task Domain (Controller, Service, Entity, DTO)
+│   │   ├── user          # User Domain (Controller, Service, Entity, DTO)
+│   │   └── Application.java
+│   └── resources         # Application properties
+└── test                  # Unit Tests
 
 ### 🚀 Getting Started
 
@@ -135,6 +153,18 @@ To run the tests using Maven Wrapper (ensures compatibility):
 ```powershell
 ./mvnw test
 ```
+
+## 🔮 Roadmap & Future Enhancements
+
+The project is continuously evolving. The following features are planned for future releases to enhance security and scalability:
+
+- [ ] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
+- [ ] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
+- [ ] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
+- [ ] **OAuth2 Integration:** Support for social login (Google/GitHub) authentication.
+- [ ] **Email Notification System:** Asynchronous email delivery for user registration verification and password resets.
+- [ ] **CI/CD Pipeline:** Automate testing and deployment workflows using **GitHub Actions**.
+
 
 
 ## 🤝 Contact
