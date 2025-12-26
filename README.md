@@ -2,8 +2,9 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-green)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
-![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.7-blue)
+![Azure](https://img.shields.io/badge/Azure-Deployed-0078D4?logo=microsoft-azure)
+![CI/CD](https://img.shields.io/badge/GitHub_Actions-Enabled-2088FF?logo=github-actions)
 ![Security](https://img.shields.io/badge/JWT-Security-red)
 
 ## 📖 About The Project
@@ -11,6 +12,14 @@
 **2Do** is a robust, scalable, and secure Backend REST API designed to demonstrate enterprise-level software development practices. It provides a comprehensive solution for task management with role-based access control.
 
 This project follows **Clean Architecture** principles, utilizing **SOLID** design patterns, and implements industry-standard security measures using **JWT (JSON Web Tokens)**.
+
+## 🚀 Live API Documentation (Swagger)
+
+The API is deployed and ready for testing. You can explore the endpoints through the interactive Swagger UI:
+
+👉 **[Live Swagger Documentation](https://todo-backend.icyfield-7f90fdb3.germanywestcentral.azurecontainerapps.io/swagger-ui/index.html)**
+
+> **Note:** Since this is a cold-start environment, the first request might take a few seconds to wake up the service.
 
 ## 🔗 Frontend Repository
 
@@ -34,6 +43,7 @@ You can find the frontend source code and installation instructions here:
 
 ## 🏗 Key Features & Architecture
 
+* **Automated CI/CD:** Every push to the main and feat branch is automatically tested, containerized, and deployed to Azure via GitHub Actions.
 * **Role-Based Access Control (RBAC):** Granular permission management for `ADMIN` and `USER` roles using Spring Security `PreAuthorize`.
 * **Task Management:** Full CRUD operations for managing tasks with ownership security (Users can only access their own tasks).
 * **Stateless Authentication:** Secure and scalable authentication via JWT.
@@ -169,12 +179,13 @@ To run the tests using Maven Wrapper (ensures compatibility):
 
 The project is continuously evolving. The following features are planned for future releases to enhance security and scalability:
 
+- [x] **Cloud Deployment:** Live on Azure.
 - [ ] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
 - [ ] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
 - [x] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
 - [ ] **OAuth2 Integration:** Support for social login (Google/GitHub) authentication.
 - [ ] **Email Notification System:** Asynchronous email delivery for user registration verification and password resets.
-- [ ] **CI/CD Pipeline:** Automate testing and deployment workflows using **GitHub Actions**.
+- [X] **CI/CD Pipeline:** Automate testing and deployment workflows using **GitHub Actions**.
 
 
 
