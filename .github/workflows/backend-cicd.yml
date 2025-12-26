@@ -1,0 +1,54 @@
+name: Java CI/CD with Azure
+
+on:
+  push:
+    branches: [ "main", "feat/**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      # 2. Deployment
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 3. Azure Container Registry
+      - name: Log in to ACR
+        run: |
+          az acr login --name ${{ secrets.ACR_USERNAME }}
+
+      # 4. Create Docker İmage and send to ACR
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/todo-backend:${{ github.sha }} .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/todo-backend:${{ github.sha }}
+
+      # 5. Deploy
+      - name: Deploy to Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          imageToDeploy: ${{ secrets.ACR_LOGIN_SERVER }}/todo-backend:${{ github.sha }}
+          resourceGroup: rg-2do-task-management
+          containerAppName: todo-backend
+          environmentVariables: |
+            SPRING_DATASOURCE_URL=${{ secrets.DB_URL }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
+            SPRING_JPA_HIBERNATE_DDL_AUTO=validate
