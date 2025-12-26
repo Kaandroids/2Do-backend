@@ -24,7 +24,7 @@ You can find the frontend source code and installation instructions here:
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
-* **Database:** PostgreSQL 16
+* **Database:** PostgreSQL 16, Flyway (Migration Management)
 * **Containerization:** Docker & Docker Compose (Full Stack)
 * **Testing:** JUnit 5, Mockito
 * **Security:** Spring Security 6, JWT Authentication & Authorization
@@ -43,6 +43,7 @@ You can find the frontend source code and installation instructions here:
 * **Performance:** Utilizes `MapStruct` for high-performance, type-safe object mapping and `FetchType.LAZY` for database optimization.
 * **Validation:** Robust input validation using Jakarta Validation (`@Valid`, `@NotBlank`, etc.).
 * **API Documentation:** Integrated **Swagger UI (OpenAPI 3)** for interactive API exploration and testing.
+* **Database Migration & Versioning:** Integrated **Flyway** to ensure robust, version-controlled database schema management.
 
 ## 📂 Project Structure
 
@@ -170,7 +171,7 @@ The project is continuously evolving. The following features are planned for fut
 
 - [ ] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
 - [ ] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
-- [ ] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
+- [x] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
 - [ ] **OAuth2 Integration:** Support for social login (Google/GitHub) authentication.
 - [ ] **Email Notification System:** Asynchronous email delivery for user registration verification and password resets.
 - [ ] **CI/CD Pipeline:** Automate testing and deployment workflows using **GitHub Actions**.
