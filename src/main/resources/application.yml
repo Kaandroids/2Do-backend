@@ -5,9 +5,10 @@ spring:
     locations: classpath:db/migration
   datasource:
     # Database Connection Settings
-    url: jdbc:postgresql://localhost:5432/2do_db
-    username: admin
-    password: admin
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/2do_db}
+    username: ${SPRING_DATASOURCE_USERNAME:admin}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
   jpa:
     # Logging SQL queries (Disable in production for performance)
     show-sql: true
@@ -38,7 +39,7 @@ application:
   security:
     jwt:
       # Secret key used for signing JWTs (Must be 256-bit or higher)
-      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
 
       # Access token expiration time in milliseconds (e.g., 86400000 ms = 24 hours)
       expiration: 86400000
@@ -46,3 +47,10 @@ application:
       # Refresh token expiration time (e.g., 7 days)
       refresh-token:
         expiration: 604800000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    path: /v3/api-docs

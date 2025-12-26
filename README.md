@@ -33,9 +33,7 @@ You can find the frontend source code and installation instructions here:
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
-* **Cloud & Deployment:** Azure Container Apps, Azure Container Registry (ACR)
-* **Database:** Azure Database for PostgreSQL (Flexible Server 17.7), Flyway
-* **CI/CD:** GitHub Actions (Automated build & deploy)
+* **Database:** PostgreSQL 16, Flyway (Migration Management)
 * **Containerization:** Docker & Docker Compose (Full Stack)
 * **Testing:** JUnit 5, Mockito
 * **Security:** Spring Security 6, JWT Authentication & Authorization
