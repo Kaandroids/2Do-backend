@@ -3,6 +3,7 @@ package com.example._Do.user.service;
 import com.example._Do.user.dto.UserCreateRequest;
 import com.example._Do.user.dto.UserResponse;
 import com.example._Do.user.entity.User;
+import com.example._Do.user.exception.UserAlreadyExistsException;
 import com.example._Do.user.mapper.UserMapper;
 import com.example._Do.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class UserService {
 
         // 1. Check if user already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("User with email " + request.getEmail() + " already exists");
+            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
         }
 
         // 2. Build Entity

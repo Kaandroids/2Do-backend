@@ -1,5 +1,7 @@
 package com.example._Do.exception;
 
+import com.example._Do.user.exception.InvalidCredentialsException;
+import com.example._Do.user.exception.UserAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +83,37 @@ public class GlobalExceptionHandler {
         ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles cases where a registration is attempted with an email that already exists.
+     * <p>
+     * Returns a 409 Conflict status code. This prevents duplicate user creation
+     * while providing a clear error message to the client.
+     * </p>
+     *
+     * @param ex      The captured {@link UserAlreadyExistsException}.
+     * @param request The HTTP request.
+     * @return A {@link ResponseEntity} containing the structured 409 error details.
+     */
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest request) {
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.CONFLICT, request);
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles cases where login credentials are incorrect.
+     * @param ex      The captured {@link InvalidCredentialsException}.
+     * @param request The HTTP request.
+     * @return A {@link ResponseEntity} containing the structured 403 error details.
+     */
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.UNAUTHORIZED, request);
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
 }
