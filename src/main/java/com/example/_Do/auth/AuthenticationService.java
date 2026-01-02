@@ -4,11 +4,15 @@ import com.example._Do.config.JwtService;
 import com.example._Do.user.dto.RegisterRequest;
 import com.example._Do.user.entity.Role;
 import com.example._Do.user.entity.User;
+import com.example._Do.user.exception.InvalidCredentialsException;
+import com.example._Do.user.exception.UserAlreadyExistsException;
 import com.example._Do.user.mapper.UserMapper;
 import com.example._Do.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,11 @@ public class AuthenticationService {
 
         log.info("Attempting to register new user with email: {}", request.getEmail());
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Registration failed: Email {} is already in use", request.getEmail());
+            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+        }
+
         User user = userMapper.toEntity(request);
         // Encode the password (mapper copied the raw one)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -65,14 +74,21 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
         log.info("Authenticating user: {}", request.getEmail());
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new InvalidCredentialsException("Invalid username or password.");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new InvalidCredentialsException("Invalid username or password.")
         );
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         String jwtToken = jwtService.generateToken(user);
         log.info("User authenticated successfully: {}", user.getEmail());
 
