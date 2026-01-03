@@ -1,6 +1,10 @@
 package com.example._Do.config;
 
+import com.example._Do.auth.LogoutService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,7 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Main configuration class for Spring Security.
@@ -33,6 +39,11 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    @Autowired(required = false)
+    private final LogoutService logoutService;
+    @Autowired(required = false)
+    private final ObjectMapper objectMapper;
+
     /**
      * Configures the security filter chain.
      *
@@ -43,13 +54,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
+                // Logout
+                .logout(logout -> logout.
+                        logoutUrl("/api/v1/auth/logout")
+                        .addLogoutHandler(logoutService)
+                        .logoutSuccessHandler(((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json");
+
+                            Map<String, String> responseBody = new HashMap<>();
+                            responseBody.put("message", "Logout successful");
+                            responseBody.put("status", "200");
+
+                            response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+                            })
+                        )
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // 1. Disable CSRF (Cross-Site Request Forgery)
+                // Disable CSRF (Cross-Site Request Forgery)
                 // Since we are using JWT (Stateless auth), we don't need CSRF protection which is mainly for session-based apps.
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 2. Configure URL Authorization
+                // Configure URL Authorization
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Whitelist: Allow public access to specific endpoints without authentication
@@ -70,16 +97,16 @@ public class SecurityConfig {
                         // Blacklist: All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
-                // 3. Session Management
+                // Session Management
                 // Set session policy to STATELESS. This ensures Spring Security does not create or use HTTP sessions.
                 // Every request must carry the JWT token.
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // 4. Set the Authentication Provider
+                // Set the Authentication Provider
                 .authenticationProvider(authenticationProvider)
 
-                // 5. Add Custom Filter
+                // Add Custom Filter
                 // Execute our JwtAuthenticationFilter BEFORE the standard UsernamePasswordAuthenticationFilter.
                 // This allows us to intercept requests and check for the token first.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
