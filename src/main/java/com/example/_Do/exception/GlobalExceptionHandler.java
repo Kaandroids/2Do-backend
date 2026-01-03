@@ -116,4 +116,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Handles cases where the rate limit is exceeded.
+     * <p>
+     * Returns a 429 Too Many Requests status code with a structured error response.
+     * </p>
+     *
+     * @param ex      The captured {@link RateLimitExceededException}.
+     * @param request The HTTP request.
+     * @return A {@link ResponseEntity} containing the structured 429 error details.
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceeded(RateLimitExceededException ex, HttpServletRequest request) {
+        ErrorResponse error = errorResponseMapper.mapToErrorResponse(ex, HttpStatus.TOO_MANY_REQUESTS, request);
+        return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
+    }
 }
