@@ -38,11 +38,11 @@ You can find the frontend source code and installation instructions here:
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
-* **Database:** PostgreSQL 16, **Redis (Distributed Caching & Rate Limiting)**
+* **Database:** PostgreSQL 16, Redis (Distributed Caching, Rate Limiting & JWT Blacklist)
 * **Migrations:** Flyway (Schema Management)
 * **Containerization:** Docker & Docker Compose
 * **Testing:** JUnit 5, Mockito
-* **Security:** Spring Security 6, JWT, **Bucket4j** (Rate Limiting)
+* **Security:** Spring Security 6, JWT, Bucket4j (Rate Limiting)
 * **ORM & Mapping:** Hibernate / JPA, MapStruct
 * **Tools:** Lombok, Maven
 * **Documentation:** OpenAPI (Swagger UI)
@@ -54,7 +54,7 @@ You can find the frontend source code and installation instructions here:
 * **Cloud-Ready Security:** Implements `X-Forwarded-For` header resolution to ensure accurate client IP tracking when deployed behind Azure Load Balancers or Gateways.
 * **Role-Based Access Control (RBAC):** Granular permission management for `ADMIN` and `USER` roles using Spring Security `PreAuthorize`.
 * **Task Management:** Full CRUD operations for managing tasks with ownership security (Users can only access their own tasks).
-* **Stateless Authentication:** Secure and scalable authentication via JWT.
+* **Stateless Authentication & Blacklisting:** Secure authentication via JWT, enhanced with a Redis-backed Blacklist.
 * **DTO Pattern:** Strict separation between persistence entities and API exposure layers.
 * **Global Exception Handling:** Centralized error management using `@RestControllerAdvice` (AOP) with SRP-compliant mapping via `ErrorResponseMapper` and standardized JSON responses.
 * **Unit Testing:** Comprehensive unit tests using **JUnit 5** and **Mockito** to ensure business logic reliability.
@@ -189,7 +189,7 @@ The project is continuously evolving. The following features are planned for fut
 
 - [x] **Cloud Deployment:** Live on Azure.
 - [X] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
-- [ ] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
+- [X] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
 - [x] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
 - [ ] **OAuth2 Integration:** Support for social login (Google/GitHub) authentication.
 - [ ] **Email Notification System:** Asynchronous email delivery for user registration verification and password resets.
