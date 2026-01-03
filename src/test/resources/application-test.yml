@@ -39,6 +39,8 @@ springdoc:
 
 # --- Custom Application Configuration (JWT) ---
 application:
+  rate-limit:
+    enabled: false
   security:
     jwt:
       # A random 256-bit (32-byte) hex key used ONLY for testing purposes.
