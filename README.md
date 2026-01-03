@@ -3,6 +3,7 @@
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-green)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.7-blue)
+![Redis](https://img.shields.io/badge/Redis-Distributed-red?logo=redis)
 ![Azure](https://img.shields.io/badge/Azure-Deployed-0078D4?logo=microsoft-azure)
 ![CI/CD](https://img.shields.io/badge/GitHub_Actions-Enabled-2088FF?logo=github-actions)
 ![Security](https://img.shields.io/badge/JWT-Security-red)
@@ -15,7 +16,7 @@ Access the latest version of the application here:
 
 **2Do** is a robust, scalable, and secure Backend REST API designed to demonstrate enterprise-level software development practices. It provides a comprehensive solution for task management with role-based access control.
 
-This project follows **Clean Architecture** principles, utilizing **SOLID** design patterns, and implements industry-standard security measures using **JWT (JSON Web Tokens)**.
+This project follows **Clean Architecture** principles, utilizing **SOLID** design patterns, and implements industry-standard security measures using **JWT (JSON Web Tokens)** and **Distributed Rate Limiting**.
 
 ## 🚀 Live API Documentation (Swagger)
 
@@ -37,10 +38,11 @@ You can find the frontend source code and installation instructions here:
 ## 🛠 Tech Stack
 
 * **Core:** Java 21, Spring Boot 3.4
-* **Database:** PostgreSQL 16, Flyway (Migration Management)
-* **Containerization:** Docker & Docker Compose (Full Stack)
+* **Database:** PostgreSQL 16, **Redis (Distributed Caching & Rate Limiting)**
+* **Migrations:** Flyway (Schema Management)
+* **Containerization:** Docker & Docker Compose
 * **Testing:** JUnit 5, Mockito
-* **Security:** Spring Security 6, JWT Authentication & Authorization
+* **Security:** Spring Security 6, JWT, **Bucket4j** (Rate Limiting)
 * **ORM & Mapping:** Hibernate / JPA, MapStruct
 * **Tools:** Lombok, Maven
 * **Documentation:** OpenAPI (Swagger UI)
@@ -48,6 +50,8 @@ You can find the frontend source code and installation instructions here:
 ## 🏗 Key Features & Architecture
 
 * **Automated CI/CD:** Every push to the main and feat branch is automatically tested, containerized, and deployed to Azure via GitHub Actions.
+* **Distributed Rate Limiting:** Integrated request throttling using **Bucket4j** and **Redis**. This protects authentication endpoints (`/auth/**`) from brute-force and DDoS attacks by enforcing a limit of 10 requests per minute per IP.
+* **Cloud-Ready Security:** Implements `X-Forwarded-For` header resolution to ensure accurate client IP tracking when deployed behind Azure Load Balancers or Gateways.
 * **Role-Based Access Control (RBAC):** Granular permission management for `ADMIN` and `USER` roles using Spring Security `PreAuthorize`.
 * **Task Management:** Full CRUD operations for managing tasks with ownership security (Users can only access their own tasks).
 * **Stateless Authentication:** Secure and scalable authentication via JWT.
@@ -184,7 +188,7 @@ To run the tests using Maven Wrapper (ensures compatibility):
 The project is continuously evolving. The following features are planned for future releases to enhance security and scalability:
 
 - [x] **Cloud Deployment:** Live on Azure.
-- [ ] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
+- [X] **Advanced Security (Rate Limiting):** Implement request throttling (using Bucket4j or Redis) to protect endpoints against Brute-Force and DDoS attacks.
 - [ ] **Secure Logout (JWT Blacklisting):** Integrate **Redis** to blacklist expired/logged-out tokens for true stateless session management.
 - [x] **Database Migration:** Integrate **Flyway** for robust, version-controlled database schema management.
 - [ ] **OAuth2 Integration:** Support for social login (Google/GitHub) authentication.
