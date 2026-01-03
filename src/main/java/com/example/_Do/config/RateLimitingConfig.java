@@ -24,7 +24,7 @@ import java.time.Duration;
  * centralized state store.
  */
 @Configuration
-@ConditionalOnProperty(name = "app.rate-limit.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "application.rate-limit.enabled", havingValue = "true", matchIfMissing = true)
 public class RateLimitingConfig {
 
     @Value("${spring.data.redis.host}")
