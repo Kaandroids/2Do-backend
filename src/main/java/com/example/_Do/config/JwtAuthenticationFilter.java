@@ -1,5 +1,6 @@
 package com.example._Do.config;
 
+import com.example._Do.auth.JwtBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    @Autowired(required = false)
+    private JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -44,24 +48,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        // 1. Check if the header contains a Bearer token
+        // Check if the header contains a Bearer token
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.trace("No Bearer token found in request headers");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Extract the token (remove "Bearer " prefix)
+        // Extract the token (remove "Bearer " prefix)
         jwt = authHeader.substring(7);
 
-        // 3. Extract username (email) from token
+        // Extract username (email) from token
         // Note: This might throw an exception if token is malformed, handled by Spring Security EntryPoint
         userEmail = jwtService.extractUsername(jwt);
 
-        // 4. Validate token and set authentication
+        // Validate token and set authentication
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                // check blacklist for jwt
+                if (jwtBlacklistService != null && jwtBlacklistService.isTokenBlacklisted(jwt)) {
+                    log.warn("Token is blacklisted for user {}", userEmail);
+                    filterChain.doFilter(request, response);
+                    return;
+                }
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

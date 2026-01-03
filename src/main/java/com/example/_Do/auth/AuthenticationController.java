@@ -2,6 +2,9 @@ package com.example._Do.auth;
 
 import com.example._Do.user.dto.RegisterRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name="Authentication", description="Operations related to user registration and login.")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+
+    @Operation(
+            summary = "Logout and invalidate token",
+            description = "Logs out the current user by adding their JWT to the Redis blacklist. The token will be unusable until its original expiration time.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully logged out and token invalidated."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing Bearer token."),
+            @ApiResponse(responseCode = "429", description = "Too Many Requests - Rate limit exceeded.")
+    })
+    @PostMapping("/logout")
+    public void logout() {
+        // This method is never executed. Spring Security intercepts the /api/v1/auth/logout path.
+        throw new IllegalStateException("This method should be intercepted by Spring Security.");
+    }
 
     @PostMapping("/register")
     @Operation(
