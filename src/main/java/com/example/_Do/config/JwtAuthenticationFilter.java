@@ -21,71 +21,100 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Filter that intercepts every request to validate the JWT token.
- * <p>
- * This filter executes once per request. It checks for the "Authorization" header,
- * extracts the JWT, validates it, and sets the user authentication in the Spring Security context.
- * </p>
+ * Security filter that intercepts every incoming HTTP request to validate JWT-based authentication.
+ * This filter is part of the Spring Security filter chain and ensures that:
+ * 1. The request contains a valid 'Bearer' token.
+ * 2. The token signature and expiration are verified.
+ * 3. The token is not present in the Redis-backed blacklist (revoked tokens).
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     @Autowired(required = false)
     private JwtBlacklistService jwtBlacklistService;
 
+    /**
+     * Core filtering logic that processes the Authorization header and orchestrates the authentication flow.
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String jwt;
-        final String userEmail;
 
         // Check if the header contains a Bearer token
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.trace("No Bearer token found in request headers");
+        if (isValidAuthHeader(authHeader)) {
+            log.trace("No Bearer token found in request headers.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extract the token (remove "Bearer " prefix)
-        jwt = authHeader.substring(7);
+        // Extract the token (remove Bearer-Prefix)
+        final String jwt = authHeader.substring(BEARER_PREFIX.length());
 
         // Extract username (email) from token
         // Note: This might throw an exception if token is malformed, handled by Spring Security EntryPoint
-        userEmail = jwtService.extractUsername(jwt);
+        final String userEmail = jwtService.extractUsername(jwt);
 
         // Validate token and set authentication
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-
-                // check blacklist for jwt
-                if (jwtBlacklistService != null && jwtBlacklistService.isTokenBlacklisted(jwt)) {
-                    log.warn("Token is blacklisted for user {}", userEmail);
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Update SecurityContext with the authenticated user
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("User authenticated via JWT: {}", userEmail);
-            } else {
-                log.warn("Invalid JWT token for user: {}", userEmail);
-            }
+            authenticateUserIfValid(request, jwt, userEmail);
         }
 
         filterChain.doFilter(request, response);
     }
+
+    /**
+     * Creates a standardized Authentication token with the user's authorities and request details.
+     */
+    private UsernamePasswordAuthenticationToken createAuthenticationToken(HttpServletRequest request, UserDetails userDetails) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        return authenticationToken;
+    }
+
+    /**
+     * Verifies if the token has been revoked (e.g., after a logout) by checking the blacklist.
+     */
+    private boolean isBlacklisted(String jwt){
+        if (jwtBlacklistService != null && jwtBlacklistService.isTokenBlacklisted(jwt)) {
+            log.warn("Access denied: Token is blacklisted.");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Orchestrates the validation of the token and updates the SecurityContext.
+     * Combines JWT claim validation with a stateful check against the blacklist.
+     */
+    private void authenticateUserIfValid(HttpServletRequest request, String jwt, String userEmail) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+
+        if (jwtService.isTokenValid(jwt, userDetails) && !isBlacklisted(jwt)){
+            UsernamePasswordAuthenticationToken authenticationToken = createAuthenticationToken(request, userDetails);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            log.debug("User authenticated via JWT: {}", userEmail);
+        } else {
+            log.warn("Invalid JWT token for user: {}", userEmail);
+        }
+    }
+
+    /**
+     * Checks if the Authorization header follows the standard "Bearer <token>" format.
+     */
+    private boolean isValidAuthHeader(String authHeader) {
+        return authHeader == null || !authHeader.startsWith("Bearer ");
+    }
+
 }
