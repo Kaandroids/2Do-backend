@@ -1,6 +1,6 @@
 package com.example._Do.config;
 
-import com.example._Do.auth.LogoutService;
+import com.example._Do.auth.service.LogoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

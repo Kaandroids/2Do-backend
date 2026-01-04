@@ -1,20 +1,19 @@
-package com.example._Do.auth;
+package com.example._Do.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
+/**
+ * Immutable response object containing the generated JWT.
+ */
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Schema(description="Response object containing the JWT access token.")
-public class AuthenticationResponse {
+public record AuthenticationResponse (
     @Schema(
             description="JWT Access Token used for authorizing subsequent requests.",
             example="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ..."
     )
-    private String token;
+    String token
+) {
+
 }

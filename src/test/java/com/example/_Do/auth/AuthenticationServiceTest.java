@@ -1,5 +1,8 @@
 package com.example._Do.auth;
 
+import com.example._Do.auth.dto.AuthenticationRequest;
+import com.example._Do.auth.dto.AuthenticationResponse;
+import com.example._Do.auth.service.AuthenticationService;
 import com.example._Do.config.JwtService;
 import com.example._Do.user.dto.RegisterRequest;
 import com.example._Do.user.entity.Role;
@@ -70,7 +73,7 @@ public class AuthenticationServiceTest {
 
             // ASSERT & VERIFY
             assertNotNull(authenticationResponse);
-            assertEquals("validToken", authenticationResponse.getToken());
+            assertEquals("validToken", authenticationResponse.token());
 
             verify(userRepository).save(userArgumentCaptor.capture());
             User savedUser = userArgumentCaptor.getValue();
@@ -110,11 +113,11 @@ public class AuthenticationServiceTest {
             // GIVEN
             AuthenticationRequest authenticationRequest = createSampleAuthenticationRequest();
             User mockUser = User.builder()
-                    .email(authenticationRequest.getEmail())
-                    .password(authenticationRequest.getPassword())
+                    .email(authenticationRequest.email())
+                    .password(authenticationRequest.password())
                     .build();
 
-            when(userRepository.findByEmail(authenticationRequest.getEmail())).thenReturn(Optional.of(mockUser));
+            when(userRepository.findByEmail(authenticationRequest.email())).thenReturn(Optional.of(mockUser));
             when(jwtService.generateToken(mockUser)).thenReturn("validToken");
 
             // ACT
@@ -122,7 +125,7 @@ public class AuthenticationServiceTest {
 
             // ASSERT & VERIFY
             assertNotNull(authenticationResponse);
-            assertEquals("validToken", authenticationResponse.getToken());
+            assertEquals("validToken", authenticationResponse.token());
 
             verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
 

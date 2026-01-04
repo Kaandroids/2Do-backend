@@ -1,5 +1,7 @@
-package com.example._Do.auth;
+package com.example._Do.auth.service;
 
+import com.example._Do.auth.dto.AuthenticationRequest;
+import com.example._Do.auth.dto.AuthenticationResponse;
 import com.example._Do.config.JwtService;
 import com.example._Do.user.dto.RegisterRequest;
 import com.example._Do.user.entity.Role;
@@ -12,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,19 +74,19 @@ public class AuthenticationService {
      */
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
-        log.info("Authenticating user: {}", request.getEmail());
+        log.info("Authenticating user: {}", request.email());
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
+                            request.email(),
+                            request.password()
                     )
             );
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepository.findByEmail(request.email()).orElseThrow(
                 () -> new InvalidCredentialsException("Invalid username or password.")
         );
 

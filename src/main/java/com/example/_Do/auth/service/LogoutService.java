@@ -1,4 +1,4 @@
-package com.example._Do.auth;
+package com.example._Do.auth.service;
 
 import com.example._Do.config.JwtService;
 import jakarta.servlet.http.HttpServletRequest;

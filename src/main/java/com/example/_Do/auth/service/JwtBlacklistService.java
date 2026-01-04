@@ -1,4 +1,4 @@
-package com.example._Do.auth;
+package com.example._Do.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
