@@ -1,4 +1,4 @@
-package com.example._Do.auth;
+package com.example._Do.auth.interceptor;
 
 import com.example._Do.exception.RateLimitExceededException;
 import io.github.bucket4j.BucketConfiguration;

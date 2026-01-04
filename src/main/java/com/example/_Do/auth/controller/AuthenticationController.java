@@ -1,5 +1,8 @@
-package com.example._Do.auth;
+package com.example._Do.auth.controller;
 
+import com.example._Do.auth.dto.AuthenticationRequest;
+import com.example._Do.auth.dto.AuthenticationResponse;
+import com.example._Do.auth.service.AuthenticationService;
 import com.example._Do.user.dto.RegisterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -1,5 +1,7 @@
-package com.example._Do.auth;
+package com.example._Do.auth.service;
 
+import com.example._Do.auth.dto.AuthenticationRequest;
+import com.example._Do.auth.dto.AuthenticationResponse;
 import com.example._Do.config.JwtService;
 import com.example._Do.user.dto.RegisterRequest;
 import com.example._Do.user.entity.Role;
@@ -12,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,16 +45,16 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
 
-        log.info("Attempting to register new user with email: {}", request.getEmail());
+        log.info("Attempting to register new user with email: {}", request.email());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Registration failed: Email {} is already in use", request.getEmail());
-            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+        if (userRepository.existsByEmail(request.email())) {
+            log.warn("Registration failed: Email {} is already in use", request.email());
+            throw new UserAlreadyExistsException("User with email " + request.email() + " already exists.");
         }
 
         User user = userMapper.toEntity(request);
         // Encode the password (mapper copied the raw one)
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.password()));
         // Force ROLE_USER for public registration (Safety measure)
         user.setRole(Role.USER);
         userRepository.save(user);
@@ -73,19 +74,19 @@ public class AuthenticationService {
      */
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
-        log.info("Authenticating user: {}", request.getEmail());
+        log.info("Authenticating user: {}", request.email());
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
+                            request.email(),
+                            request.password()
                     )
             );
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepository.findByEmail(request.email()).orElseThrow(
                 () -> new InvalidCredentialsException("Invalid username or password.")
         );
 

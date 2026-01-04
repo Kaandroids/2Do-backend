@@ -1,6 +1,6 @@
 package com.example._Do.config;
 
-import com.example._Do.auth.RateLimitingInterceptor;
+import com.example._Do.auth.interceptor.RateLimitingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
