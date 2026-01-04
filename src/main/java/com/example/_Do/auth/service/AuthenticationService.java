@@ -45,16 +45,16 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
 
-        log.info("Attempting to register new user with email: {}", request.getEmail());
+        log.info("Attempting to register new user with email: {}", request.email());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Registration failed: Email {} is already in use", request.getEmail());
-            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+        if (userRepository.existsByEmail(request.email())) {
+            log.warn("Registration failed: Email {} is already in use", request.email());
+            throw new UserAlreadyExistsException("User with email " + request.email() + " already exists.");
         }
 
         User user = userMapper.toEntity(request);
         // Encode the password (mapper copied the raw one)
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.password()));
         // Force ROLE_USER for public registration (Safety measure)
         user.setRole(Role.USER);
         userRepository.save(user);

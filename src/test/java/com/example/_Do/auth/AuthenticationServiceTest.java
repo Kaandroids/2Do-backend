@@ -63,9 +63,9 @@ public class AuthenticationServiceTest {
             RegisterRequest registerRequest = createSampleRegisterRequest();
             User mappedUser = new User();
 
-            when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
             when(userMapper.toEntity(registerRequest)).thenReturn(mappedUser);
-            when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("hashedPassword");
+            when(passwordEncoder.encode(registerRequest.password())).thenReturn("hashedPassword");
             when(jwtService.generateToken(any())).thenReturn("validToken");
 
             // ACT
@@ -91,7 +91,7 @@ public class AuthenticationServiceTest {
         void register_ShouldFail_WhenUserAlreadyExists() {
             // GIVEN
             RegisterRequest registerRequest = createSampleRegisterRequest();
-            when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(true);
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
 
             // ACT
             assertThrows(UserAlreadyExistsException.class, () -> authenticationService.register(registerRequest));

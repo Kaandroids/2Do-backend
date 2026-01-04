@@ -54,18 +54,18 @@ public class UserService {
      */
     @Transactional
     public UserResponse createUser(UserCreateRequest request) {
-        log.info("Admin creating a new user with email: {}", request.getEmail());
+        log.info("Admin creating a new user with email: {}", request.email());
 
         // 1. Check if user already exists
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email " + request.email() + " already exists.");
         }
 
         // 2. Build Entity
         User user = userMapper.toEntity(request);
 
         // CRITICAL: Encode password manually
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.password()));
 
         // 3. Save to DB
         User savedUser = userRepository.save(user);
