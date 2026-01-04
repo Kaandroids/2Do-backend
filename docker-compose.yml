@@ -1,4 +1,14 @@
 services:
+  # --- Redis
+  redis:
+    image: redis:7-alpine
+    container_name: 2do-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - 2do-network
+    restart: always
+
   # --- Database Service (PostgreSQL) ---
   postgres:
     image: postgres:16
@@ -31,6 +41,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       - postgres         # Ensure database starts before the application
+      - redis            # Ensure database starts before the application
     networks:
       - 2do-network
     restart: always
