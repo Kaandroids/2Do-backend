@@ -48,4 +48,4 @@ jobs:
           imageToDeploy: ${{ secrets.ACR_LOGIN_SERVER }}/todo-backend:${{ github.sha }}
           resourceGroup: rg-2do-task-management
           containerAppName: todo-backend
-          environmentVariables: "SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} SPRING_JPA_HIBERNATE_DDL_AUTO=validate SPRING_DATA_REDIS_HOST=${{ secrets.REDIS_HOST }} SPRING_DATA_REDIS_PORT=${{ secrets.REDIS_PORT }} SPRING_DATA_REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} SPRING_DATA_REDIS_SSL_ENABLED=true APPLICATION_RATE_LIMIT_ENABLED=true"
+          environmentVariables: "SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} SPRING_JPA_HIBERNATE_DDL_AUTO=validate SPRING_DATA_REDIS_HOST=${{ secrets.REDIS_HOST }} SPRING_DATA_REDIS_PORT=${{ secrets.REDIS_PORT }} SPRING_DATA_REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} SPRING_DATA_REDIS_SSL_ENABLED=true APPLICATION_RATE_LIMIT_ENABLED=true GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}"

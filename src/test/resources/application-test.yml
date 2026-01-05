@@ -31,6 +31,12 @@ spring:
       hibernate:
         format_sql: true # Formats the logged SQL for better readability
 
+# Google - Settings & Api-Key
+google:
+  gemini:
+    api-key: ${GEMINI_API_KEY}
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+
 # --- OpenAPI / Swagger Configuration ---
 # We disable Swagger in tests to prevent startup overhead and unrelated errors.
 springdoc:

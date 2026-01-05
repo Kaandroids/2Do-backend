@@ -1,7 +1,9 @@
 package com.example._Do.task.controller;
 
+import com.example._Do.task.dto.AiTaskResponse;
 import com.example._Do.task.dto.TaskRequest;
 import com.example._Do.task.dto.TaskResponse;
+import com.example._Do.task.service.AiTaskService;
 import com.example._Do.task.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,6 +37,7 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
+    private final AiTaskService aiTaskService;
 
     /**
      * Creates a new task for the authenticated user.
@@ -134,4 +138,10 @@ public class TaskController {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/ai-generate")
+    public ResponseEntity<AiTaskResponse> generateTaskFromVoice(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(aiTaskService.processVoiceTask(file));
+    }
+
 }
