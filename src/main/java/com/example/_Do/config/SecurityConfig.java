@@ -1,5 +1,6 @@
 package com.example._Do.config;
 
+import com.example._Do.auth.filter;
 import com.example._Do.auth.service.LogoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +37,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final filter.JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
     @Autowired(required = false)

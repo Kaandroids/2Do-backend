@@ -1,4 +1,4 @@
-package com.example._Do.config;
+package com.example._Do.auth.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
