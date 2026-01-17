@@ -2,7 +2,6 @@ package com.example._Do.auth.service;
 
 import com.example._Do.auth.dto.AuthenticationRequest;
 import com.example._Do.auth.dto.AuthenticationResponse;
-import com.example._Do.config.JwtService;
 import com.example._Do.user.dto.RegisterRequest;
 import com.example._Do.user.entity.Role;
 import com.example._Do.user.entity.User;

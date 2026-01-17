@@ -1,6 +1,5 @@
 package com.example._Do.auth.service;
 
-import com.example._Do.config.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
