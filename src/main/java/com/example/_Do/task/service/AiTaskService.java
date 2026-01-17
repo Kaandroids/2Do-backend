@@ -33,7 +33,7 @@ public class AiTaskService {
     // TODO refactor
     public AiTaskResponse processVoiceTask(MultipartFile file) {
         try {
-            if (isApiKeyValid()) {
+            if (!isApiKeyMissing()) {
                 throw new RuntimeException("Api-Key is not found.");
             }
 
@@ -56,7 +56,7 @@ public class AiTaskService {
         }
     }
 
-    private boolean isApiKeyValid() {
+    private boolean isApiKeyMissing() {
         return apiKey != null && !apiKey.isEmpty();
     }
 
