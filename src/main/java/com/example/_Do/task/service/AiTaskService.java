@@ -1,6 +1,7 @@
 package com.example._Do.task.service;
 
 import com.example._Do.task.dto.AiTaskResponse;
+import com.example._Do.task.prompt.GeminiPromptBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,61 +27,24 @@ public class AiTaskService {
     private String geminiUrl;
 
     private final ObjectMapper objectMapper;
+    private final GeminiPromptBuilder geminiPromptBuilder;
+    private final RestClient restClient;
 
     // TODO refactor
     public AiTaskResponse processVoiceTask(MultipartFile file) {
         try {
-            log.info("Processing voice file: {}, size: {}", file.getOriginalFilename(), file.getSize());
-            String base64Audio = Base64.getEncoder().encodeToString(file.getBytes());
-            String today = java.time.LocalDate.now().toString();
-            if (apiKey == null || apiKey.isEmpty()) {
+            if (isApiKeyValid()) {
                 throw new RuntimeException("Api-Key is not found.");
             }
 
-            String englishPrompt = """
-            You are a task management assistant. Analyze this voice recording:
-            1. Language: Identify the language spoken in the recording. Return 'title' and 'description' in that SAME language.
-            2. Date Control:
-               - Use the Reference Date (%s) to calculate relative dates like 'tomorrow', 'next Friday', etc.
-               - If a specific date or time is mentioned, return it in 'YYYY-MM-DDTHH:mm:ss' format.
-               - If NO date or time is mentioned, set 'dueDate' to null.
-            3. If a clear task or 'to-do' is identified:
-               - Set 'isTaskDetected' to true.
-               - Fill 'title', 'description', 'priority', and 'dueDate'.
-            4. If the audio is empty, contains only noise, or no task is mentioned:
-               - Set 'isTaskDetected' to false.
-               - Leave other fields null or empty.
-            
-            Return ONLY a valid JSON object in this format:
-            {
-              "title": "Short task title",
-              "description": "Detailed description",
-              "priority": "LOW/MEDIUM/HIGH",
-              "dueDate": "YYYY-MM-DDTHH:mm:ss",
-              "isTaskDetected": true/false
-            }
-            """.formatted(today);
+            log.info("Processing voice file: {}, size: {}", file.getOriginalFilename(), file.getSize());
 
-            Map<String, Object> textPart = Map.of(
-                    "text", englishPrompt
-            );
+            String base64Audio = Base64.getEncoder().encodeToString(file.getBytes());
+            String englishPrompt = geminiPromptBuilder.buildTaskDetectionPrompt();
 
-            Map<String, Object> audioPart = Map.of(
-                    "inline_data", Map.of(
-                            "mime_type", "audio/wav",
-                            "data", base64Audio
-                    )
-            );
+            Map<String, Object> requestBody = buildRequestBody(englishPrompt, base64Audio);
 
-            Map<String, Object> contentObject = Map.of("parts", List.of(textPart, audioPart));
-            Map<String, Object> requestBody = Map.of("contents", List.of(contentObject));
-
-            RestClient restClient = RestClient.create();
-            String response = restClient.post()
-                    .uri(geminiUrl + "?key=" + apiKey)
-                    .body(requestBody)
-                    .retrieve()
-                    .body(String.class);
+            String response = geminiApiCall(requestBody);
 
             log.info("Response: {}", response);
             return parseGeminiResponse(response);
@@ -90,6 +54,30 @@ public class AiTaskService {
             // TODO add custom error
             throw new RuntimeException("Error:" , e);
         }
+    }
+
+    private boolean isApiKeyValid() {
+        return apiKey != null && !apiKey.isEmpty();
+    }
+
+    private String geminiApiCall(Map<String, Object> requestBody) {
+        return restClient.post()
+                .uri(geminiUrl + "?key=" + apiKey)
+                .body(requestBody)
+                .retrieve()
+                .body(String.class);
+    }
+
+    private Map<String, Object> buildRequestBody(String prompt, String base64Audio){
+        return Map.of("contents", List.of(
+                Map.of("parts", List.of(
+                        Map.of("text", prompt),
+                        Map.of("inline_data", Map.of(
+                                "mime_type", "audio/wav",
+                                "data", base64Audio
+                        ))
+                ))
+        ));
     }
 
     private AiTaskResponse parseGeminiResponse(String response) throws Exception {
