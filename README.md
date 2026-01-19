@@ -11,6 +11,7 @@
 ## 🚀 Live Demo
 Access the latest version of the application here:
 👉 **[2Do Web Application](https://gentle-cliff-06c31ee03.6.azurestaticapps.net/)**
+> ⏱️ **Note:** Please allow **15-20 seconds** for the initial request. The backend Docker container may take a moment to wake up if it has been idle.
 
 ## 📖 About The Project
 
@@ -49,6 +50,7 @@ You can find the frontend source code and installation instructions here:
 
 ## 🏗 Key Features & Architecture
 
+* **AI-Powered Voice Task Generation:** Leverages the **Google Gemini API** to transform natural language voice recordings into structured tasks. It employs a **Prompt Engineering** architecture—structured into **Persona, Context, Instructions, and Output Format**—to ensure consistent extraction of task metadata (titles, descriptions, priorities, and due dates).
 * **Automated CI/CD:** Every push to the main and feat branch is automatically tested, containerized, and deployed to Azure via GitHub Actions.
 * **Distributed Rate Limiting:** Integrated request throttling using **Bucket4j** and **Redis**. This protects authentication endpoints (`/auth/**`) from brute-force and DDoS attacks by enforcing a limit of 10 requests per minute per IP.
 * **Cloud-Ready Security:** Implements `X-Forwarded-For` header resolution to ensure accurate client IP tracking when deployed behind Azure Load Balancers or Gateways.
