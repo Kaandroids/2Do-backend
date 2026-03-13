@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -23,11 +24,15 @@ public class TaskResponse {
     private LocalDateTime dueDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long userId;
+    private String creatorFirstName;
+    private String creatorLastName;
     private Long groupId;
     private Long assigneeId;
     private String assigneeFirstName;
     private String assigneeLastName;
     private Set<Long> mentionedUserIds;
+    private List<String> mentionedUserNames;
     @JsonProperty("isPrivate")
     private boolean isPrivate;
 }

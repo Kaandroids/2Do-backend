@@ -27,10 +27,14 @@ public interface TaskMapper {
     /**
      * Converts entity to response DTO.
      */
-    @Mapping(target = "groupId", source = "group.id")
-    @Mapping(target = "assigneeId", source = "assignee.id")
+    @Mapping(target = "userId",            source = "user.id")
+    @Mapping(target = "creatorFirstName",  source = "user.firstName")
+    @Mapping(target = "creatorLastName",   source = "user.lastName")
+    @Mapping(target = "groupId",           source = "group.id")
+    @Mapping(target = "assigneeId",        source = "assignee.id")
     @Mapping(target = "assigneeFirstName", source = "assignee.firstName")
-    @Mapping(target = "assigneeLastName", source = "assignee.lastName")
+    @Mapping(target = "assigneeLastName",  source = "assignee.lastName")
+    @Mapping(target = "mentionedUserNames", ignore = true)
     TaskResponse toResponse(Task task);
 
     /**

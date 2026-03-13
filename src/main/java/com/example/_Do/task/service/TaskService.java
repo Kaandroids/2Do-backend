@@ -74,7 +74,7 @@ public class TaskService {
         }
 
         Task savedTask = taskRepository.save(task);
-        return taskMapper.toResponse(savedTask);
+        return toResponseWithMentions(savedTask);
     }
 
     @Transactional(readOnly = true)
@@ -106,7 +106,7 @@ public class TaskService {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), all.size());
         List<TaskResponse> page = start >= all.size() ? List.of() :
-                all.subList(start, end).stream().map(taskMapper::toResponse).toList();
+                all.subList(start, end).stream().map(this::toResponseWithMentions).toList();
         return new PageImpl<>(page, pageable, all.size());
     }
 
@@ -128,7 +128,7 @@ public class TaskService {
                         || t.getUser().getId().equals(currentUserId)
                         || isOwner
                         || t.getMentionedUserIds().contains(currentUserId))
-                .map(taskMapper::toResponse)
+                .map(this::toResponseWithMentions)
                 .toList();
 
         int start = (int) pageable.getOffset();
@@ -140,7 +140,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskResponse getTaskById(Long taskId) {
         Task task = getTaskOrThrow(taskId);
-        return taskMapper.toResponse(task);
+        return toResponseWithMentions(task);
     }
 
     @Transactional
@@ -179,7 +179,7 @@ public class TaskService {
             task.setAssignee(null);
         }
 
-        return taskMapper.toResponse(taskRepository.save(task));
+        return toResponseWithMentions(taskRepository.save(task));
     }
 
     @Transactional
@@ -206,6 +206,18 @@ public class TaskService {
 
         log.info("Deleting task ID: {}", taskId);
         taskRepository.delete(task);
+    }
+
+    private TaskResponse toResponseWithMentions(Task task) {
+        TaskResponse resp = taskMapper.toResponse(task);
+        if (task.getMentionedUserIds() != null && !task.getMentionedUserIds().isEmpty()) {
+            List<String> names = userRepository.findAllById(task.getMentionedUserIds())
+                    .stream()
+                    .map(u -> u.getFirstName() + " " + u.getLastName())
+                    .toList();
+            resp.setMentionedUserNames(names);
+        }
+        return resp;
     }
 
     private User getCurrentUser() {
