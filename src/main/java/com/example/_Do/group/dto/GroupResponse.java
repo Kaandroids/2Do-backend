@@ -1,6 +1,7 @@
 package com.example._Do.group.dto;
 
 import com.example._Do.group.entity.GroupPermission;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class GroupResponse {
     private long pendingTaskCount;
     private Set<GroupPermission> myPermissions;
     private LocalDateTime createdAt;
+    @JsonProperty("isOwner")
     private boolean isOwner;
 }

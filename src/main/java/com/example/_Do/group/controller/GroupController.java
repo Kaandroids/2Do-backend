@@ -34,6 +34,15 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getMyGroups());
     }
 
+    @PutMapping("/{groupId}")
+    @Operation(summary = "Update group name/description (owner only)")
+    public ResponseEntity<GroupResponse> updateGroup(
+            @PathVariable Long groupId,
+            @Valid @RequestBody GroupRequest request
+    ) {
+        return ResponseEntity.ok(groupService.updateGroup(groupId, request));
+    }
+
     @DeleteMapping("/{groupId}")
     @Operation(summary = "Delete a group (owner only)")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {

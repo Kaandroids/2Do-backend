@@ -47,6 +47,22 @@ public class GroupService {
         return toGroupResponse(saved, currentUser, 0, 0);
     }
 
+    @Transactional
+    public GroupResponse updateGroup(Long groupId, GroupRequest request) {
+        User currentUser = getCurrentUser();
+        Group group = getGroupOrThrow(groupId);
+        requireOwner(group, currentUser);
+
+        group.setName(request.getName());
+        group.setDescription(request.getDescription());
+        Group saved = groupRepository.save(group);
+        log.info("User {} updated group {}", currentUser.getId(), groupId);
+
+        int memberCount = groupMemberRepository.findAllByGroupId(groupId).size();
+        long pendingTaskCount = taskRepository.countByGroupIdAndCompleted(groupId, false);
+        return toGroupResponse(saved, currentUser, memberCount, pendingTaskCount);
+    }
+
     @Transactional(readOnly = true)
     public List<GroupResponse> getMyGroups() {
         User currentUser = getCurrentUser();
