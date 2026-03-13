@@ -16,12 +16,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +64,11 @@ public class TaskService {
                         .orElseThrow(() -> new EntityNotFoundException("Assignee not found"));
                 task.setAssignee(assignee);
             }
+
+            if (taskRequest.getMentionedUserIds() != null && !taskRequest.getMentionedUserIds().isEmpty()) {
+                task.setMentionedUserIds(new HashSet<>(taskRequest.getMentionedUserIds()));
+            }
+            task.setPrivate(taskRequest.isPrivate());
         }
 
         Task savedTask = taskRepository.save(task);
@@ -87,7 +95,19 @@ public class TaskService {
             throw new AccessDeniedException("Access denied to this group");
         }
 
-        return taskRepository.findAllByGroupId(groupId, pageable).map(taskMapper::toResponse);
+        Long currentUserId = currentUser.getId();
+        List<TaskResponse> visible = taskRepository.findAllByGroupId(groupId).stream()
+                .filter(t -> !t.isPrivate()
+                        || t.getUser().getId().equals(currentUserId)
+                        || isOwner
+                        || t.getMentionedUserIds().contains(currentUserId))
+                .map(taskMapper::toResponse)
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), visible.size());
+        List<TaskResponse> page = start > visible.size() ? List.of() : visible.subList(start, end);
+        return new PageImpl<>(page, pageable, visible.size());
     }
 
     @Transactional(readOnly = true)

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Entity class representing a Task in the database.
@@ -42,6 +44,14 @@ public class Task {
     private Priority priority;
 
     private boolean completed;
+
+    @Column(name = "is_private", nullable = false)
+    private boolean isPrivate = false;
+
+    @ElementCollection
+    @CollectionTable(name = "task_mentions", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "user_id")
+    private Set<Long> mentionedUserIds = new HashSet<>();
 
     // --- RELATIONSHIPS ---
 

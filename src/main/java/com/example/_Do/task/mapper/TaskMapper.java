@@ -21,6 +21,7 @@ public interface TaskMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "assignee", ignore = true)
+    @Mapping(target = "mentionedUserIds", ignore = true)
     Task toEntity(TaskRequest taskRequest);
 
     /**

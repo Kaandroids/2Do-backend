@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -40,4 +41,10 @@ public class TaskRequest {
 
     @Schema(description = "User ID to assign this task to within the group", example = "5")
     private Long assigneeId;
+
+    @Schema(description = "List of user IDs mentioned in this task")
+    private List<Long> mentionedUserIds;
+
+    @Schema(description = "If true, task is only visible to mentioned users, task creator, and group owner", example = "false")
+    private boolean isPrivate;
 }
