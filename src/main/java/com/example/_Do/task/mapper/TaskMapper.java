@@ -16,22 +16,29 @@ public interface TaskMapper {
 
     /**
      * Converts request to entity.
-     * Note: 'user' field is ignored here, it must be set by the Service.
+     * Note: 'user', 'group', 'assignee' fields are ignored here — set by the Service.
      */
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "assignee", ignore = true)
     Task toEntity(TaskRequest taskRequest);
 
     /**
      * Converts entity to response DTO.
      */
+    @Mapping(target = "groupId", source = "group.id")
+    @Mapping(target = "assigneeId", source = "assignee.id")
+    @Mapping(target = "assigneeFirstName", source = "assignee.firstName")
+    @Mapping(target = "assigneeLastName", source = "assignee.lastName")
     TaskResponse toResponse(Task task);
 
     /**
      * Updates an existing entity from a request (for Update operations).
-     * This avoids creating a new object manually.
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "assignee", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromRequest(TaskRequest taskRequest, @MappingTarget Task task);
 }

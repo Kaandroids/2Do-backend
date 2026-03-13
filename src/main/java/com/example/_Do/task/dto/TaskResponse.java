@@ -21,4 +21,8 @@ public class TaskResponse {
     private LocalDateTime dueDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long groupId;
+    private Long assigneeId;
+    private String assigneeFirstName;
+    private String assigneeLastName;
 }

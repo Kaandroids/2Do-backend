@@ -34,4 +34,10 @@ public class TaskRequest {
 
     @Schema(description = "Is the task completed?", example = "false")
     private boolean completed;
+
+    @Schema(description = "Group ID if this is a group task (null for personal tasks)", example = "1")
+    private Long groupId;
+
+    @Schema(description = "User ID to assign this task to within the group", example = "5")
+    private Long assigneeId;
 }

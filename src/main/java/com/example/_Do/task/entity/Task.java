@@ -1,5 +1,6 @@
 package com.example._Do.task.entity;
 
+import com.example._Do.group.entity.Group;
 import com.example._Do.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -46,14 +47,24 @@ public class Task {
 
     /**
      * The user who owns this task.
-     * <p>
-     * FetchType.LAZY is used for performance; the user data is loaded only when explicitly requested.
-     * ToString.Exclude prevents circular references/infinite loops during debugging/logging.
-     * </p>
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    /**
+     * The group this task belongs to. Null means personal task.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group;
+
+    /**
+     * The group member this task is assigned to. Null if unassigned.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
 
     // --- AUDIT FIELDS ---
 

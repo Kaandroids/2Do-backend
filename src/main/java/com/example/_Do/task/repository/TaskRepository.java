@@ -31,4 +31,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      * @return List of matching tasks.
      */
     List<Task> findAllByUserIdAndCompleted(Long userId, boolean completed);
+
+    Page<Task> findAllByGroupId(Long groupId, Pageable pageable);
 }
