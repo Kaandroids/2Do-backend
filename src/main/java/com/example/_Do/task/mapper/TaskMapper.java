@@ -21,7 +21,7 @@ public interface TaskMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "assignee", ignore = true)
-    @Mapping(target = "mentionedUserIds", ignore = true)
+    @Mapping(target = "assigneeIds", ignore = true)
     Task toEntity(TaskRequest taskRequest);
 
     /**
@@ -34,7 +34,7 @@ public interface TaskMapper {
     @Mapping(target = "assigneeId",        source = "assignee.id")
     @Mapping(target = "assigneeFirstName", source = "assignee.firstName")
     @Mapping(target = "assigneeLastName",  source = "assignee.lastName")
-    @Mapping(target = "mentionedUserNames", ignore = true)
+    @Mapping(target = "assigneeNames", ignore = true)
     TaskResponse toResponse(Task task);
 
     /**

@@ -31,8 +31,8 @@ public class TaskResponse {
     private Long assigneeId;
     private String assigneeFirstName;
     private String assigneeLastName;
-    private Set<Long> mentionedUserIds;
-    private List<String> mentionedUserNames;
+    private Set<Long> assigneeIds;
+    private List<String> assigneeNames;
     @JsonProperty("isPrivate")
     private boolean isPrivate;
 }

@@ -44,7 +44,7 @@ public class TaskRequest {
     private Long assigneeId;
 
     @Schema(description = "List of user IDs mentioned in this task")
-    private List<Long> mentionedUserIds;
+    private List<Long> assigneeIds;
 
     @Schema(description = "If true, task is only visible to mentioned users, task creator, and group owner", example = "false")
     @JsonProperty("isPrivate")

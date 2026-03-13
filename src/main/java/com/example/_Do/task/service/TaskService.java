@@ -67,14 +67,14 @@ public class TaskService {
                 task.setAssignee(assignee);
             }
 
-            if (taskRequest.getMentionedUserIds() != null && !taskRequest.getMentionedUserIds().isEmpty()) {
-                task.setMentionedUserIds(new HashSet<>(taskRequest.getMentionedUserIds()));
+            if (taskRequest.getAssigneeIds() != null && !taskRequest.getAssigneeIds().isEmpty()) {
+                task.setAssigneeIds(new HashSet<>(taskRequest.getAssigneeIds()));
             }
             task.setPrivate(taskRequest.isPrivate());
         }
 
         Task savedTask = taskRepository.save(task);
-        return toResponseWithMentions(savedTask);
+        return toResponseWithDetails(savedTask);
     }
 
     @Transactional(readOnly = true)
@@ -94,7 +94,7 @@ public class TaskService {
                             .filter(t -> !t.isPrivate()
                                     || t.getUser().getId().equals(currentUserId)
                                     || isGroupOwner
-                                    || t.getMentionedUserIds().contains(currentUserId));
+                                    || t.getAssigneeIds().contains(currentUserId));
                 })
                 .toList();
 
@@ -106,7 +106,7 @@ public class TaskService {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), all.size());
         List<TaskResponse> page = start >= all.size() ? List.of() :
-                all.subList(start, end).stream().map(this::toResponseWithMentions).toList();
+                all.subList(start, end).stream().map(this::toResponseWithDetails).toList();
         return new PageImpl<>(page, pageable, all.size());
     }
 
@@ -127,8 +127,8 @@ public class TaskService {
                 .filter(t -> !t.isPrivate()
                         || t.getUser().getId().equals(currentUserId)
                         || isOwner
-                        || t.getMentionedUserIds().contains(currentUserId))
-                .map(this::toResponseWithMentions)
+                        || t.getAssigneeIds().contains(currentUserId))
+                .map(this::toResponseWithDetails)
                 .toList();
 
         int start = (int) pageable.getOffset();
@@ -140,7 +140,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskResponse getTaskById(Long taskId) {
         Task task = getTaskOrThrow(taskId);
-        return toResponseWithMentions(task);
+        return toResponseWithDetails(task);
     }
 
     @Transactional
@@ -179,7 +179,7 @@ public class TaskService {
             task.setAssignee(null);
         }
 
-        return toResponseWithMentions(taskRepository.save(task));
+        return toResponseWithDetails(taskRepository.save(task));
     }
 
     @Transactional
@@ -208,14 +208,14 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
-    private TaskResponse toResponseWithMentions(Task task) {
+    private TaskResponse toResponseWithDetails(Task task) {
         TaskResponse resp = taskMapper.toResponse(task);
-        if (task.getMentionedUserIds() != null && !task.getMentionedUserIds().isEmpty()) {
-            List<String> names = userRepository.findAllById(task.getMentionedUserIds())
+        if (task.getAssigneeIds() != null && !task.getAssigneeIds().isEmpty()) {
+            List<String> names = userRepository.findAllById(task.getAssigneeIds())
                     .stream()
                     .map(u -> u.getFirstName() + " " + u.getLastName())
                     .toList();
-            resp.setMentionedUserNames(names);
+            resp.setAssigneeNames(names);
         }
         return resp;
     }

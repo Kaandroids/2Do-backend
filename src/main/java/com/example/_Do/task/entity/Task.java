@@ -49,9 +49,9 @@ public class Task {
     private boolean isPrivate = false;
 
     @ElementCollection
-    @CollectionTable(name = "task_mentions", joinColumns = @JoinColumn(name = "task_id"))
+    @CollectionTable(name = "task_assignees", joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "user_id")
-    private Set<Long> mentionedUserIds = new HashSet<>();
+    private Set<Long> assigneeIds = new HashSet<>();
 
     // --- RELATIONSHIPS ---
 
