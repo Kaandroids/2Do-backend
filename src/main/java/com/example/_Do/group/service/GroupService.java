@@ -79,7 +79,7 @@ public class GroupService {
     public void inviteMember(Long groupId, GroupInviteRequest request) {
         User currentUser = getCurrentUser();
         Group group = getGroupOrThrow(groupId);
-        requireOwner(group, currentUser);
+        requireOwnerOrPermission(group, currentUser, GroupPermission.CAN_INVITE);
 
         User invitee = userRepository.findByEmail(request.getInviteeEmail())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + request.getInviteeEmail()));
@@ -117,7 +117,7 @@ public class GroupService {
     public void updateMemberPermissions(Long groupId, Long userId, GroupUpdatePermissionsRequest request) {
         User currentUser = getCurrentUser();
         Group group = getGroupOrThrow(groupId);
-        requireOwner(group, currentUser);
+        requireOwnerOrPermission(group, currentUser, GroupPermission.CAN_MANAGE);
 
         GroupMember member = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found in this group"));
@@ -233,6 +233,16 @@ public class GroupService {
     private void requireOwner(Group group, User user) {
         if (!group.getOwner().getId().equals(user.getId())) {
             throw new AccessDeniedException("Only the group owner can perform this action");
+        }
+    }
+
+    private void requireOwnerOrPermission(Group group, User user, GroupPermission permission) {
+        if (group.getOwner().getId().equals(user.getId())) return;
+        boolean hasPerm = groupMemberRepository.findByGroupIdAndUserId(group.getId(), user.getId())
+                .map(m -> m.getPermissions().contains(permission))
+                .orElse(false);
+        if (!hasPerm) {
+            throw new AccessDeniedException("You do not have permission to perform this action");
         }
     }
 
