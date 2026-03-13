@@ -18,4 +18,5 @@ public class GroupMemberResponse {
     private String lastName;
     private String email;
     private Set<GroupPermission> permissions;
+    private boolean isOwner;
 }

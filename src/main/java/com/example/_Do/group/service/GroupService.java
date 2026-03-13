@@ -146,15 +146,28 @@ public class GroupService {
         Group group = getGroupOrThrow(groupId);
         requireMemberOrOwner(group, currentUser);
 
-        return groupMemberRepository.findAllByGroupId(groupId).stream()
+        GroupMemberResponse ownerEntry = GroupMemberResponse.builder()
+                .userId(group.getOwner().getId())
+                .firstName(group.getOwner().getFirstName())
+                .lastName(group.getOwner().getLastName())
+                .email(group.getOwner().getEmail())
+                .permissions(Set.of(GroupPermission.values()))
+                .isOwner(true)
+                .build();
+
+        List<GroupMemberResponse> members = groupMemberRepository.findAllByGroupId(groupId).stream()
                 .map(m -> GroupMemberResponse.builder()
                         .userId(m.getUser().getId())
                         .firstName(m.getUser().getFirstName())
                         .lastName(m.getUser().getLastName())
                         .email(m.getUser().getEmail())
                         .permissions(m.getPermissions())
+                        .isOwner(false)
                         .build())
-                .toList();
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+
+        members.add(0, ownerEntry);
+        return members;
     }
 
     @Transactional
