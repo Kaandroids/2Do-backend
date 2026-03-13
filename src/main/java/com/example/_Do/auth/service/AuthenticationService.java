@@ -11,6 +11,8 @@ import com.example._Do.user.mapper.UserMapper;
 import com.example._Do.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -98,7 +100,7 @@ public class AuthenticationService {
     }
 
     private Map<String, Object> nameClaimsFor(User user) {
-        Map<String, Object> claims = new java.util.HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("firstName", user.getFirstName());
         claims.put("lastName", user.getLastName());
         return claims;
