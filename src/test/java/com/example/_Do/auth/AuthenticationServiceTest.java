@@ -66,7 +66,7 @@ public class AuthenticationServiceTest {
             when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
             when(userMapper.toEntity(registerRequest)).thenReturn(mappedUser);
             when(passwordEncoder.encode(registerRequest.password())).thenReturn("hashedPassword");
-            when(jwtService.generateToken(any())).thenReturn("validToken");
+            when(jwtService.generateToken(any(), any())).thenReturn("validToken");
 
             // ACT
             AuthenticationResponse authenticationResponse = authenticationService.register(registerRequest);
@@ -118,7 +118,7 @@ public class AuthenticationServiceTest {
                     .build();
 
             when(userRepository.findByEmail(authenticationRequest.email())).thenReturn(Optional.of(mockUser));
-            when(jwtService.generateToken(mockUser)).thenReturn("validToken");
+            when(jwtService.generateToken(any(), any())).thenReturn("validToken");
 
             // ACT
             AuthenticationResponse authenticationResponse = authenticationService.authenticate(authenticationRequest);
