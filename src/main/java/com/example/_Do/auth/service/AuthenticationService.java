@@ -59,7 +59,7 @@ public class AuthenticationService {
         userRepository.save(user);
         log.info("User registered successfully with ID: {}", user.getId());
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(nameClaimsFor(user), user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
@@ -89,11 +89,18 @@ public class AuthenticationService {
                 () -> new InvalidCredentialsException("Invalid username or password.")
         );
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(nameClaimsFor(user), user);
         log.info("User authenticated successfully: {}", user.getEmail());
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private Map<String, Object> nameClaimsFor(User user) {
+        Map<String, Object> claims = new java.util.HashMap<>();
+        claims.put("firstName", user.getFirstName());
+        claims.put("lastName", user.getLastName());
+        return claims;
     }
 }
