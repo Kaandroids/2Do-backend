@@ -4,6 +4,7 @@ import com.example._Do.task.entity.Priority;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,5 +47,6 @@ public class TaskRequest {
     private List<Long> mentionedUserIds;
 
     @Schema(description = "If true, task is only visible to mentioned users, task creator, and group owner", example = "false")
+    @JsonProperty("isPrivate")
     private boolean isPrivate;
 }

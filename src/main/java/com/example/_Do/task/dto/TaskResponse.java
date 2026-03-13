@@ -1,6 +1,7 @@
 package com.example._Do.task.dto;
 
 import com.example._Do.task.entity.Priority;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class TaskResponse {
     private String assigneeFirstName;
     private String assigneeLastName;
     private Set<Long> mentionedUserIds;
+    @JsonProperty("isPrivate")
     private boolean isPrivate;
 }
