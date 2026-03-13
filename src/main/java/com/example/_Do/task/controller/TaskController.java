@@ -68,14 +68,17 @@ public class TaskController {
      */
     @GetMapping
     @Operation(
-            summary = "Get my tasks (Paged)",
-            description = "Retrieves a paged list of tasks belonging to the authenticated user. " +
-                    "You can filter by page, size, and sort. Example: ?page=0&size=5&sort=createdAt,desc"
+            summary = "Get tasks (Paged)",
+            description = "Retrieves a paged list of tasks. Pass groupId to get group tasks, omit for personal tasks."
     )
     @ApiResponse(responseCode = "200", description = "Page of tasks retrieved successfully")
     public ResponseEntity<Page<TaskResponse>> getAllTasks(
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long groupId
     ) {
+        if (groupId != null) {
+            return ResponseEntity.ok(taskService.getGroupTasks(groupId, pageable));
+        }
         return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
