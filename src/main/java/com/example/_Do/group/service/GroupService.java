@@ -44,7 +44,7 @@ public class GroupService {
         Group saved = groupRepository.save(group);
         log.info("User {} created group '{}'", currentUser.getId(), saved.getName());
 
-        return toGroupResponse(saved, currentUser, 0, 0);
+        return toGroupResponse(saved, currentUser, 1, 0); // 1 = owner only
     }
 
     @Transactional
@@ -58,7 +58,7 @@ public class GroupService {
         Group saved = groupRepository.save(group);
         log.info("User {} updated group {}", currentUser.getId(), groupId);
 
-        int memberCount = groupMemberRepository.findAllByGroupId(groupId).size();
+        int memberCount = groupMemberRepository.findAllByGroupId(groupId).size() + 1; // +1 for owner
         long pendingTaskCount = taskRepository.countByGroupIdAndCompleted(groupId, false);
         return toGroupResponse(saved, currentUser, memberCount, pendingTaskCount);
     }
@@ -69,7 +69,7 @@ public class GroupService {
         List<Group> groups = groupRepository.findAllByOwnerOrMember(currentUser);
 
         return groups.stream().map(g -> {
-            int memberCount = groupMemberRepository.findAllByGroupId(g.getId()).size();
+            int memberCount = groupMemberRepository.findAllByGroupId(g.getId()).size() + 1; // +1 for owner
             long pendingTaskCount = taskRepository.countByGroupIdAndCompleted(g.getId(), false);
             return toGroupResponse(g, currentUser, memberCount, pendingTaskCount);
         }).toList();
