@@ -1,6 +1,7 @@
 package com.example._Do.group.dto;
 
 import com.example._Do.group.entity.GroupPermission;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,6 @@ public class GroupMemberResponse {
     private String lastName;
     private String email;
     private Set<GroupPermission> permissions;
+    @JsonProperty("isOwner")
     private boolean isOwner;
 }
