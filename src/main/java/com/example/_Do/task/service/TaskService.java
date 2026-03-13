@@ -23,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -78,9 +80,34 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Page<TaskResponse> getAllTasks(Pageable pageable) {
         User currentUser = getCurrentUser();
-        log.info("Retrieving personal tasks for user: {}", currentUser.getId());
-        return taskRepository.findAllByUserId(currentUser.getId(), pageable)
-                .map(taskMapper::toResponse);
+        Long currentUserId = currentUser.getId();
+        log.info("Retrieving all tasks for user: {}", currentUserId);
+
+        // Personal tasks (no group)
+        List<Task> personal = taskRepository.findAllByUserIdAndGroupIsNull(currentUserId);
+
+        // Visible tasks from every group the user belongs to
+        List<Task> groupTasks = groupRepository.findAllByOwnerOrMember(currentUser).stream()
+                .flatMap(g -> {
+                    boolean isGroupOwner = g.getOwner().getId().equals(currentUserId);
+                    return taskRepository.findAllByGroupId(g.getId()).stream()
+                            .filter(t -> !t.isPrivate()
+                                    || t.getUser().getId().equals(currentUserId)
+                                    || isGroupOwner
+                                    || t.getMentionedUserIds().contains(currentUserId));
+                })
+                .toList();
+
+        List<Task> all = new ArrayList<>();
+        all.addAll(personal);
+        all.addAll(groupTasks);
+        all.sort(Comparator.comparing(Task::getCreatedAt).reversed());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), all.size());
+        List<TaskResponse> page = start >= all.size() ? List.of() :
+                all.subList(start, end).stream().map(taskMapper::toResponse).toList();
+        return new PageImpl<>(page, pageable, all.size());
     }
 
     @Transactional(readOnly = true)
