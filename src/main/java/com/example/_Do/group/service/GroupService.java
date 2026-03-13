@@ -5,6 +5,7 @@ import com.example._Do.group.entity.*;
 import com.example._Do.group.repository.GroupInvitationRepository;
 import com.example._Do.group.repository.GroupMemberRepository;
 import com.example._Do.group.repository.GroupRepository;
+import com.example._Do.task.repository.TaskRepository;
 import com.example._Do.user.entity.User;
 import com.example._Do.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +29,7 @@ public class GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final GroupInvitationRepository groupInvitationRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Transactional
     public GroupResponse createGroup(GroupRequest request) {
@@ -42,7 +44,7 @@ public class GroupService {
         Group saved = groupRepository.save(group);
         log.info("User {} created group '{}'", currentUser.getId(), saved.getName());
 
-        return toGroupResponse(saved, currentUser, 0);
+        return toGroupResponse(saved, currentUser, 0, 0);
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +54,8 @@ public class GroupService {
 
         return groups.stream().map(g -> {
             int memberCount = groupMemberRepository.findAllByGroupId(g.getId()).size();
-            return toGroupResponse(g, currentUser, memberCount);
+            long pendingTaskCount = taskRepository.countByGroupIdAndCompleted(g.getId(), false);
+            return toGroupResponse(g, currentUser, memberCount, pendingTaskCount);
         }).toList();
     }
 
@@ -225,7 +228,7 @@ public class GroupService {
         }
     }
 
-    private GroupResponse toGroupResponse(Group group, User currentUser, int memberCount) {
+    private GroupResponse toGroupResponse(Group group, User currentUser, int memberCount, long pendingTaskCount) {
         boolean isOwner = group.getOwner().getId().equals(currentUser.getId());
         Set<GroupPermission> myPermissions = isOwner
                 ? Set.of(GroupPermission.values())
@@ -239,6 +242,7 @@ public class GroupService {
                 .description(group.getDescription())
                 .ownerName(group.getOwner().getFirstName() + " " + group.getOwner().getLastName())
                 .memberCount(memberCount)
+                .pendingTaskCount(pendingTaskCount)
                 .myPermissions(myPermissions)
                 .createdAt(group.getCreatedAt())
                 .isOwner(isOwner)

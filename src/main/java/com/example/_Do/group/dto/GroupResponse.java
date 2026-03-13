@@ -19,6 +19,7 @@ public class GroupResponse {
     private String description;
     private String ownerName;
     private int memberCount;
+    private long pendingTaskCount;
     private Set<GroupPermission> myPermissions;
     private LocalDateTime createdAt;
     private boolean isOwner;

@@ -33,4 +33,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByUserIdAndCompleted(Long userId, boolean completed);
 
     Page<Task> findAllByGroupId(Long groupId, Pageable pageable);
+
+    long countByGroupIdAndCompleted(Long groupId, boolean completed);
 }
