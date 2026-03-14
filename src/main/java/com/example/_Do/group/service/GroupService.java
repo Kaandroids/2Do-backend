@@ -122,7 +122,11 @@ public class GroupService {
         GroupMember member = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found in this group"));
 
-        member.setPermissions(request.getPermissions());
+        Set<GroupPermission> permissions = new java.util.HashSet<>(request.getPermissions());
+        if (permissions.contains(GroupPermission.CAN_MANAGE)) {
+            permissions.addAll(Set.of(GroupPermission.values()));
+        }
+        member.setPermissions(permissions);
         groupMemberRepository.save(member);
         log.info("Updated permissions for user {} in group {}", userId, groupId);
     }
